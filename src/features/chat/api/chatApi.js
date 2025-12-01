@@ -182,12 +182,13 @@ export const chatApi = {
       includeThinking,
     }),
 
-  generateWithSearch: ({ prompt, aspectRatio, imageSize, sessionId }) =>
+  generateWithSearch: ({ prompt, aspectRatio, imageSize, includeThinking, sessionId }) =>
     callGeminiApi({
       sessionId,
       prompt,
       aspectRatio,
       imageSize,
+      includeThinking,
       useSearch: true,
     }),
 

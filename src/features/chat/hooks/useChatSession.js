@@ -110,6 +110,7 @@ export function useChatSession() {
           prompt: prompt.trim(),
           aspectRatio,
           imageSize,
+          includeThinking,
           sessionId,
         });
       } else {

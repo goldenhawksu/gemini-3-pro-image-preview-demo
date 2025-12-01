@@ -14,7 +14,6 @@ function App() {
   return (
     <div className="flex h-screen w-full flex-col bg-background text-foreground">
       <ChatHeader
-        sessionId={state.sessionId}
         loading={state.loading}
         onReset={actions.reset}
         onOpenSettings={() => setSettingsOpen(true)}

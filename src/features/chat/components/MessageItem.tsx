@@ -1,5 +1,8 @@
 import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { Download, Copy, Check } from 'lucide-react'
+import { ImageLightbox } from '@/components/ImageLightbox'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { ChatMessage } from '@/features/chat/types'
@@ -12,6 +15,7 @@ type MessageItemProps = {
 export function MessageItem({ message, onDownload }: MessageItemProps) {
   const isUser = message.role === 'user'
   const [copied, setCopied] = useState(false)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
 
   const handleCopy = () => {
     if (message.text) {
@@ -42,7 +46,38 @@ export function MessageItem({ message, onDownload }: MessageItemProps) {
         {/* 文本内容 + 复制按钮 */}
         {message.text && (
           <div className="relative group/text">
-            <p className="whitespace-pre-wrap text-sm leading-relaxed">{message.text}</p>
+            <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  a: (props) => (
+                    <a {...props} target="_blank" rel="noreferrer" />
+                  ),
+                  code({ inline, className, children, ...props }) {
+                    if (inline) {
+                      return (
+                        <code
+                          className={cn("rounded bg-muted px-1 py-0.5 text-xs font-medium", className)}
+                          {...props}
+                        >
+                          {children}
+                        </code>
+                      )
+                    }
+
+                    return (
+                      <pre className="overflow-x-auto rounded-lg bg-muted px-3 py-2 text-sm">
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      </pre>
+                    )
+                  },
+                }}
+              >
+                {message.text}
+              </ReactMarkdown>
+            </div>
             {!isUser && (
               <button
                 onClick={handleCopy}
@@ -88,24 +123,34 @@ export function MessageItem({ message, onDownload }: MessageItemProps) {
 
         {/* AI生成的图片 */}
         {message.imageData && (
-          <div className="mt-3 relative group">
-            <img
-              src={`data:image/png;base64,${message.imageData}`}
-              alt="generated"
-              className="w-full h-auto max-w-2xl rounded-xl border shadow-sm bg-muted/10 min-h-[100px]"
-            />
-            <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-200 flex gap-2">
-              <Button
-                size="icon"
-                variant="secondary"
-                className="h-9 w-9 shadow-lg backdrop-blur-sm bg-background/80 hover:bg-background"
-                onClick={() => onDownload(message.imageData!)}
-                title="下载图片"
-              >
-                <Download className="h-4 w-4" />
-              </Button>
+          <>
+            <div className="mt-3 relative group" onClick={() => setLightboxOpen(true)}>
+              <img
+                src={`data:image/png;base64,${message.imageData}`}
+                alt="generated"
+                className="w-full h-auto max-w-md rounded-xl border shadow-sm bg-muted/10 min-h-[100px] cursor-pointer hover:brightness-95"
+              />
+              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-200 flex gap-2">
+                <Button
+                  size="icon"
+                  variant="secondary"
+                  className="h-9 w-9 shadow-lg backdrop-blur-sm bg-background/80 hover:bg-background"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onDownload(message.imageData!)
+                  }}
+                  title="下载图片"
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-          </div>
+            <ImageLightbox
+              src={`data:image/png;base64,${message.imageData}`}
+              open={lightboxOpen}
+              onOpenChange={setLightboxOpen}
+            />
+          </>
         )}
       </div>
     </div>

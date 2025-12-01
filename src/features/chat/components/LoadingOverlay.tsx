@@ -19,7 +19,7 @@ export function LoadingOverlay({ show, message = "正在生成图像，请稍候
         <Loader2 className="h-5 w-5 animate-spin text-primary" />
         <div className="flex flex-col">
           <span className="font-medium text-sm">{message}</span>
-          <span className="text-xs text-muted-foreground">通常 3-8 秒完成，如有参考图会稍久</span>
+          <span className="text-xs text-muted-foreground">通常 10 秒完成，如有参数调整可能会更久</span>
         </div>
       </div>
     </div>
